@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net471;net462;net472;net48;net47;netstandard2.1;netcoreapp3.1</TargetFrameworks>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+        <PackageReference Include="xunit" Version="2.4.0">
+            <NoWarn>NU1701</NoWarn>
+        </PackageReference>
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0">
+            <NoWarn>NU1701</NoWarn>
+        </PackageReference>
+        <PackageReference Include="coverlet.collector" Version="1.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\src\JosephGuadagno.AzureHelpers.Cosmos.csproj" />
+    </ItemGroup>
+
+</Project>
