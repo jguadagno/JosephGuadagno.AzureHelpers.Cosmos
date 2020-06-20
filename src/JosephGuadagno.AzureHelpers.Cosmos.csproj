@@ -2,6 +2,23 @@
 
     <PropertyGroup>
         <TargetFrameworks>net462;net47;net471;net472;net48;netstandard2.1</TargetFrameworks>
+        <Company>JosephGuadagno.NET, LLC</Company>
+        <Authors>Joseph Guadagno</Authors>
+        <Product>JosephGuadagno Azure Helpers - CosmosDb</Product>
+        <Description>A collection of classes that aid in developing applications around Azure Table Storage</Description>
+        <Copyright>Copyright ©2014-2020, Joseph Guadagno, JosephGuadagno.Net, LLC; josephguadagno.net</Copyright>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <VersionMajor>1</VersionMajor>
+        <VersionMinor>0</VersionMinor>
+        <VersionBuild>1</VersionBuild>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <VersionPrefix Condition=" '$(BUILD_BUILDNUMBER)' == '' ">$(VersionMajor).$(VersionMinor).$(VersionBuild)-local</VersionPrefix>
+        <VersionPrefix Condition=" '$(BUILD_BUILDNUMBER)' != '' And '$(Configuration)' == 'Debug'" >$(VersionMajor).$(VersionMinor).$(VersionBuild)-$(BUILD_BUILDNUMBER)-preview</VersionPrefix>
+        <VersionPrefix Condition=" '$(Configuration)' != 'Debug'">$(VersionMajor).$(VersionMinor).$(VersionBuild)</VersionPrefix>
     </PropertyGroup>
 
     <ItemGroup>

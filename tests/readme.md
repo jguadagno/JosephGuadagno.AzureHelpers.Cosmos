@@ -12,4 +12,4 @@ To use it run the following from the command
 
 ```npm
 cosmosdb-server -p 3000
-```cosr
+```
