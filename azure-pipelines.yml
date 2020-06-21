@@ -54,7 +54,7 @@ steps:
   inputs:
     command: 'custom'
     custom: 'tool'
-    arguments: 'install --tool-path . NuGetKeyVaultSignTool'
+    arguments: 'install --tool-path . NuGetKeyVaultSignTool -version 2.0.2'
 
 - task: PowerShell@2
   displayName: Running NuGetKeyVaultSign
