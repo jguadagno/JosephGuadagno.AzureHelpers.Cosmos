@@ -30,14 +30,15 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: 'Build the Assembly'
   inputs:
-    command: build
-    versioningScheme: byBuildNumber
+    command: 'build'
+    projects: './src/*.csproj'
     arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: 'Run the Unit Tests'
   inputs:
     command: 'test'
+    projects: './tests/*.csproj'
 
 - task: DotNetCoreCLI@2
   displayName: Package up the Assembly
