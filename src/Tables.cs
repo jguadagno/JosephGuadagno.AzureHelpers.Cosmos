@@ -5,44 +5,62 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace JosephGuadagno.AzureHelpers.Cosmos
 {
-    // TODO: Add/Update Xml documentation
-    
+    /// <summary>
+    /// Provides methods for interacting with Tables in Azure Storage Tables or Azure CosmosDB Tables
+    /// </summary>
     public class Tables
     {
-        public CloudTableClient CloudTableClient { get; }
-        
         /// <summary>
-        /// Creates an instance of the <see cref="Tables"/> using the supplied <paramref name="storageConnectionString">Storage Account Url</paramref>
+        /// The reference to the current CloudTableClient being used
         /// </summary>
-        /// <param name="storageConnectionString">A url to the cloud storage account to use.</param>
+        public CloudTableClient CloudTableClient { get; }
+
+        /// <summary>
+        /// Creates an instance of the Tables
+        /// </summary>
+        /// <param name="storageConnectionString">The storage connection string to use</param>
+        /// <exception cref="ArgumentNullException">Throws if the <see cref="storageConnectionString"/> is null or empty</exception>
         public Tables(string storageConnectionString)
         {
             if (string.IsNullOrEmpty(storageConnectionString))
             {
-                throw new ArgumentNullException(nameof(storageConnectionString), "The storage connection string cannot be null or empty");
+                throw new ArgumentNullException(nameof(storageConnectionString),
+                    "The storage connection string cannot be null or empty");
             }
-            
-            var cloudStorageAccount = CloudStorageAccountHelper.CreateStorageAccountFromConnectionString(storageConnectionString);
+
+            var cloudStorageAccount =
+                CloudStorageAccountHelper.CreateStorageAccountFromConnectionString(storageConnectionString);
             CloudTableClient = cloudStorageAccount.CreateCloudTableClient();
         }
 
         /// <summary>
-        /// Creates an instance of the <see cref="Tables"/> using the supplied <paramref name="cloudStorageAccount">CloudStorageAccount</paramref>
+        /// Creates an instance of the Tables
         /// </summary>
-        /// <param name="cloudStorageAccount"></param>
+        /// <param name="cloudStorageAccount">The CloudStorageAccount to use</param>
+        /// <exception cref="ArgumentNullException">Throws if the <see cref="cloudStorageAccount"/> is null</exception>
+        /// <remarks>You can get a reference to a <see cref="CloudStorageAccount"/> by using <see cref="CloudStorageAccountHelper.CreateStorageAccountFromConnectionString"/></remarks>
         public Tables(CloudStorageAccount cloudStorageAccount)
         {
             if (cloudStorageAccount == null)
             {
-                throw new ArgumentNullException(nameof(cloudStorageAccount), "The cloud storage account cannot be null or empty");
+                throw new ArgumentNullException(nameof(cloudStorageAccount),
+                    "The cloud storage account cannot be null or empty");
             }
+
             CloudTableClient = cloudStorageAccount.CreateCloudTableClient();
         }
-        
+
         // TODO: Implement in the future
         // ListTablesSegmented
-        
-        // GetCloudTable
+
+        /// <summary>
+        /// Gets a reference to the CloudTable
+        /// </summary>
+        /// <param name="tableName">The name of the table</param>
+        /// <param name="createIfNeeded">Indicates if you want to create the table if it does not already exists. The default is false.</param>
+        /// <returns>A reference to the CloudTable</returns>
+        /// <exception cref="ArgumentNullException">Throws if the the <see cref="tableName"/> is null or empty</exception>
+        /// <remarks>This can be used to create an instance of the <see cref="Table"/> class</remarks>
         public async Task<CloudTable> GetCloudTableAsync(string tableName, bool createIfNeeded = false)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -67,9 +85,17 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
                     return null;
                 }
             }
-            return  cloudTable;
+
+            return cloudTable;
         }
 
+        /// <summary>
+        /// Creates a new table
+        /// </summary>
+        /// <param name="tableName">The name of the table</param>
+        /// <returns>A reference to the CloudTable</returns>
+        /// <exception cref="ArgumentNullException">Throws if the the <see cref="tableName"/> is null or empty</exception>
+        /// <remarks>This can be used to create an instance of the <see cref="Table"/> class</remarks>
         // CreateAsync (CreateIfNotExists)
         public async Task<CloudTable> CreateCloudTableAsync(string tableName)
         {
@@ -82,18 +108,31 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
             return await CreateCloudTableAsync(cloudTable);
         }
 
+        /// <summary>
+        /// Creates a new table
+        /// </summary>
+        /// <param name="cloudTable">The table</param>
+        /// <returns>A reference to the CloudTable</returns>
+        /// <exception cref="ArgumentNullException">Throws if the the <see cref="cloudTable"/> is null</exception>
+        /// <remarks>This can be used to create an instance of the <see cref="Table"/> class</remarks>
         public async Task<CloudTable> CreateCloudTableAsync(CloudTable cloudTable)
         {
             if (cloudTable == null)
             {
                 throw new ArgumentNullException(nameof(cloudTable), "The cloud table cannot be null");
             }
-            
+
             await cloudTable.CreateAsync();
-            
+
             return cloudTable;
         }
 
+        /// <summary>
+        /// Deletes a table
+        /// </summary>
+        /// <param name="tableName">The name of the table</param>
+        /// <returns>True, if successful, otherwise, false.</returns>
+        /// <exception cref="ArgumentNullException">Throws if the the <see cref="tableName"/> is null or empty</exception>
         // Delete
         public async Task<bool> DeleteCloudTableAsync(string tableName)
         {
@@ -107,9 +146,16 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
             {
                 return false;
             }
+
             return await DeleteCloudTableAsync(cloudTable);
         }
 
+        /// <summary>
+        /// Deletes a table
+        /// </summary>
+        /// <param name="cloudTable">The table</param>
+        /// <returns>True, if successful, otherwise, false.</returns>
+        /// <exception cref="ArgumentNullException">Throws if the the <see cref="cloudTable"/> is null</exception>
         public async Task<bool> DeleteCloudTableAsync(CloudTable cloudTable)
         {
             if (cloudTable == null)
@@ -129,6 +175,13 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
             return true;
         }
 
+
+        /// <summary>
+        /// Checks if the table exists
+        /// </summary>
+        /// <param name="tableName">The name of the table</param>
+        /// <returns>True, if the table exists, otherwise, false</returns>
+        /// <exception cref="ArgumentNullException">Throws if the <see cref="tableName"/> is null or empty</exception>
         // ExistsAsync
         public async Task<bool> DoesCloudTableExistsAsync(string tableName)
         {
@@ -139,7 +192,13 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
 
             return await CloudTableClient.GetTableReference(tableName).ExistsAsync();
         }
-        
+
+        /// <summary>
+        /// Checks if the table exists
+        /// </summary>
+        /// <param name="tableName">The name of the table</param>
+        /// <returns>True, if the table exists, otherwise, false</returns>
+        /// <exception cref="ArgumentNullException">Throws if the <see cref="tableName"/> is null or empty</exception>
         // Exists
         public bool DoesCloudTableExists(string tableName)
         {
@@ -150,11 +209,17 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
 
             return CloudTableClient.GetTableReference(tableName).Exists();
         }
-        
+
+        /// <summary>
+        /// Gets a list of all of the tables in current Azure Account
+        /// </summary>
+        /// <param name="tableStartsWith">Only get tables that start with this string. Default is null.</param>
+        /// <returns>A List of CloudTable's</returns>
+        /// <remarks>An item in this list can be used to create an instance of <see cref="Table"/></remarks>
         //ListTables
         public async Task<IEnumerable<CloudTable>> GetListOfTablesAsync(string tableStartsWith = null)
         {
-            return await Task.Run (function: () => CloudTableClient.ListTables(tableStartsWith));
+            return await Task.Run(function: () => CloudTableClient.ListTables(tableStartsWith));
         }
     }
 }

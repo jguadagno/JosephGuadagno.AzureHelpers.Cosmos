@@ -5,18 +5,29 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace JosephGuadagno.AzureHelpers.Cosmos
 {
-    // TODO: Implement IDE Suggestions
-    // TODO: Add/Update Xml documentation
-    
+    /// <summary>
+    /// Provides methods to work with objects in a table in Azure Storage or Azure CosmosDb.
+    /// </summary>
+    /// <remarks>To add, remove, lists, etc. with Tables, please refer to <see cref="Tables"/></remarks>
     public class Table
     {
+        /// <summary>
+        /// A reference to the table being used
+        /// </summary>
         public CloudTable CloudTable { get; }
 
+        /// <summary>
+        /// Creates an instance of the table
+        /// </summary>
+        /// <param name="storageConnectionString">The connection string to the storage</param>
+        /// <param name="tableName">The name of the table</param>
+        /// <exception cref="ArgumentNullException">Throws if either the <see cref="storageConnectionString"/> or <see cref="tableName"/> are null or empty</exception>
         public Table(string storageConnectionString, string tableName)
         {
             if (string.IsNullOrEmpty(storageConnectionString))
             {
-                throw new ArgumentNullException(nameof(storageConnectionString), "The storage connection string cannot be null or empty");
+                throw new ArgumentNullException(nameof(storageConnectionString),
+                    "The storage connection string cannot be null or empty");
             }
 
             if (string.IsNullOrEmpty(tableName))
@@ -30,6 +41,11 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
             CloudTable = cloudTableClient.GetTableReference(tableName);
         }
 
+        /// <summary>
+        /// Creates an instance of the table
+        /// </summary>
+        /// <param name="cloudTable">The cloud table</param>
+        /// <exception cref="ArgumentNullException">Throws if <see cref="cloudTable"/>is null</exception>
         public Table(CloudTable cloudTable)
         {
             if (cloudTable == null)
@@ -39,11 +55,17 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
 
             CloudTable = cloudTable;
         }
-        
+
         // TODO: Implement in the future
         // ExecuteBatchAsync
         // ExecuteQueryAsync
 
+        /// <summary>
+        /// Inserts the entity
+        /// </summary>
+        /// <param name="tableEntity">An object that inherits from TableEntity</param>
+        /// <returns>A <see cref="TableOperationResult"/> with the results of the operation</returns>
+        /// <exception cref="ArgumentNullException">Throws if the <see cref="tableEntity"/> is null</exception>
         public async Task<TableOperationResult> InsertEntityAsync(TableEntity tableEntity)
         {
             if (tableEntity == null)
@@ -61,6 +83,12 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
             return result;
         }
 
+        /// <summary>
+        /// Insert the entity if it doesn't exists, otherwise merges this entity with the existing one
+        /// </summary>
+        /// <param name="tableEntity">An object that inherits from TableEntity</param>
+        /// <returns>A <see cref="TableOperationResult"/> with the results of the operation</returns>
+        /// <exception cref="ArgumentNullException">Throws if the <see cref="tableEntity"/> is null</exception>
         public async Task<TableOperationResult> InsertOrMergeEntityAsync(TableEntity tableEntity)
         {
             if (tableEntity == null)
@@ -78,6 +106,12 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
             return result;
         }
 
+        /// <summary>
+        /// Insert the entity if it doesn't exists, otherwise replace the existing one with this one
+        /// </summary>
+        /// <param name="tableEntity">An object that inherits from TableEntity</param>
+        /// <returns>A <see cref="TableOperationResult"/> with the results of the operation</returns>
+        /// <exception cref="ArgumentNullException">Throws if the <see cref="tableEntity"/> is null</exception>
         public async Task<TableOperationResult> InsertOrReplaceEntityAsync(TableEntity tableEntity)
         {
             if (tableEntity == null)
@@ -95,6 +129,12 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
             return result;
         }
 
+        /// <summary>
+        /// Merge the entity with an existing one
+        /// </summary>
+        /// <param name="tableEntity">An object that inherits from TableEntity</param>
+        /// <returns>A <see cref="TableOperationResult"/> with the results of the operation</returns>
+        /// <exception cref="ArgumentNullException">Throws if the <see cref="tableEntity"/> is null</exception>
         public async Task<TableOperationResult> MergeEntityAsync(TableEntity tableEntity)
         {
             if (tableEntity == null)
@@ -106,7 +146,7 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
             {
                 tableEntity.ETag = "*";
             }
-            
+
             var mergeOperation = TableOperation.Merge(tableEntity);
             var tableResult = await CloudTable.ExecuteAsync(mergeOperation);
 
@@ -117,13 +157,19 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
             return result;
         }
 
+        /// <summary>
+        /// Replaces an existing entity with the existing one
+        /// </summary>
+        /// <param name="tableEntity">An object that inherits from TableEntity</param>
+        /// <returns>A <see cref="TableOperationResult"/> with the results of the operation</returns>
+        /// <exception cref="ArgumentNullException">Throws if the <see cref="tableEntity"/> is null</exception>
         public async Task<TableOperationResult> ReplaceEntityAsync(TableEntity tableEntity)
         {
             if (tableEntity == null)
             {
                 throw new ArgumentNullException(nameof(tableEntity), "The table entity cannot be null");
             }
-            
+
             if (tableEntity.ETag == null)
             {
                 tableEntity.ETag = "*";
@@ -139,13 +185,19 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
             return result;
         }
 
+        /// <summary>
+        /// Deletes an existing entity
+        /// </summary>
+        /// <param name="tableEntity">An object that inherits from TableEntity</param>
+        /// <returns>A <see cref="TableOperationResult"/> with the results of the operation</returns>
+        /// <exception cref="ArgumentNullException">Throws if the <see cref="tableEntity"/> is null</exception>
         public async Task<TableOperationResult> DeleteEntityAsync(TableEntity tableEntity)
         {
             if (tableEntity == null)
             {
                 throw new ArgumentNullException(nameof(tableEntity), "The table entity cannot be null");
             }
-            
+
             if (tableEntity.ETag == null)
             {
                 tableEntity.ETag = "*";
@@ -160,7 +212,14 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
             };
             return result;
         }
-        
+
+        /// <summary>
+        /// Gets a entity from the table
+        /// </summary>
+        /// <param name="partitionKey">The partition key</param>
+        /// <param name="rowKey">The row key</param>
+        /// <typeparam name="T">The object to deserialize the results into</typeparam>
+        /// <returns>The object if found, otherwise, null</returns>
         public async Task<T> GetTableEntityAsync<T>(string partitionKey, string rowKey)
             where T : class, ITableEntity
         {
