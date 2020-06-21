@@ -1,0 +1,77 @@
+# Generic script to build, test, sign, and deploy NuGet packages
+
+parameters:
+  - name: buildConfig
+    displayName: Build Configuration to Use
+    default: Debug
+    values:
+    - Debug
+    - Release
+
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+- name: buildConfiguration
+  value: ${{ parameters.buildConfig }}
+- group: CodeSigning
+
+steps:
+- task: UseDotNet@2
+  displayName: Setup .NET SDK Version 3.x
+  inputs:
+    packageType: sdk
+    version: 3.x
+    includePreviewVersions: true
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build the Assembly'
+  inputs:
+    command: build
+    versioningScheme: byBuildNumber
+    arguments: '--configuration $(BuildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Run the Unit Tests'
+  inputs:
+    command: 'test'
+
+- task: DotNetCoreCLI@2
+  displayName: Package up the Assembly
+  inputs:
+    command: 'pack'
+    packagesToPack: './src/*.csproj'
+    nobuild: true
+    verbosityPack: 'Normal'
+
+- task: DotNetCoreCLI@2
+  displayName: Install NuGetKeyVaultSignTool
+  inputs:
+    command: 'custom'
+    custom: 'tool'
+    arguments: 'install --tool-path . NuGetKeyVaultSignTool'
+
+- task: PowerShell@2
+  displayName: Running NuGetKeyVaultSign
+  inputs:
+    targetType: 'inline'
+    script: |
+      .\NuGetKeyVaultSignTool sign ./src/**/*.nupkg `
+      --file-digest "sha256" `
+      --timestamp-rfc3161 "http://timestamp.digicert.com" `
+      --timestamp-digest "sha256" `
+      --azure-key-vault-url "https://personalsecrets.vault.azure.net/" `
+      --azure-key-vault-client-id "$(azure-key-vault-client-id)" `
+      --azure-key-vault-client-secret "$(azure-key-vault-client-secret)" `
+      --azure-key-vault-certificate "JosephGuadagno-2020"
+
+- task: NuGetCommand@2
+  displayName: Publishing package(s) to NuGet
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'external'
+    publishFeedCredentials: 'Public-NuGet'
