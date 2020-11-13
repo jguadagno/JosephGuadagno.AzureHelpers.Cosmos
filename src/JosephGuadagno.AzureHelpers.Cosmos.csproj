@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net462;net47;net471;net472;net48;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>net462;net47;net471;net472;net48;netstandard2.1;net5.0</TargetFrameworks>
         <Company>JosephGuadagno.NET, LLC</Company>
         <Authors>Joseph Guadagno</Authors>
         <Product>JosephGuadagno Azure Helpers - CosmosDb</Product>
@@ -17,7 +17,7 @@
     <PropertyGroup>
         <VersionMajor>1</VersionMajor>
         <VersionMinor>0</VersionMinor>
-        <VersionBuild>2</VersionBuild>
+        <VersionBuild>3</VersionBuild>
     </PropertyGroup>
 
     <PropertyGroup>

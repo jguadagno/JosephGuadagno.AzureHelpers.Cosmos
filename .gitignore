@@ -495,3 +495,5 @@ MigrationBackup/
 __blogstorage__/
 __queuestorage__/
 __azurite*.json
+
+.idea/
