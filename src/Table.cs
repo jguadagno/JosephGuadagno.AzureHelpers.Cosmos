@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
@@ -48,12 +49,8 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
         /// <exception cref="ArgumentNullException">Throws if <see cref="cloudTable"/>is null</exception>
         public Table(CloudTable cloudTable)
         {
-            if (cloudTable == null)
-            {
-                throw new ArgumentNullException(nameof(cloudTable), "The cloud table cannot be null");
-            }
-
-            CloudTable = cloudTable;
+            CloudTable = cloudTable ??
+                         throw new ArgumentNullException(nameof(cloudTable), "The cloud table cannot be null");
         }
 
         // TODO: Implement in the future
@@ -232,6 +229,34 @@ namespace JosephGuadagno.AzureHelpers.Cosmos
             var retrieveTableOperation = TableOperation.Retrieve<T>(partitionKey, rowKey);
             var result = await CloudTable.ExecuteAsync(retrieveTableOperation);
             return result?.Result as T;
+        }
+
+        /// <summary>
+        /// Returns all of the entities for a given partition key
+        /// </summary>
+        /// <param name="partitionKey">The partition key</param>
+        /// <param name="takeCount">The number of rows to retrieve</param>
+        /// <typeparam name="T">The object to deserialize the results into</typeparam>
+        /// <returns>The objects for the partition, otherwise, null</returns>
+        public virtual async Task<List<T>> GetPartitionAsync<T>(string partitionKey, int takeCount = 1000)
+            where T : class, ITableEntity, new()
+        {
+            var result = new List<T>();
+            var query =
+                new TableQuery<T>().Where(
+                    TableQuery.GenerateFilterCondition("PartitionKey",
+                        QueryComparisons.Equal,
+                        partitionKey));
+            query.TakeCount = takeCount;
+            TableContinuationToken tableContinuationToken = null;
+            do
+            {
+                var queryResponse = await CloudTable.ExecuteQuerySegmentedAsync(query, tableContinuationToken);
+                tableContinuationToken = queryResponse.ContinuationToken;
+                result.AddRange(queryResponse.Results);
+            } while (tableContinuationToken != null);
+
+            return result;
         }
     }
 }

@@ -6,7 +6,7 @@
         <Authors>Joseph Guadagno</Authors>
         <Product>JosephGuadagno Azure Helpers - CosmosDb</Product>
         <Description>A collection of classes that aid in developing applications around Azure Table Storage</Description>
-        <Copyright>Copyright ©2014-2020, Joseph Guadagno, JosephGuadagno.Net, LLC; josephguadagno.net</Copyright>
+        <Copyright>Copyright ©2014-2021, Joseph Guadagno, JosephGuadagno.Net, LLC; josephguadagno.net</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageTags>Azure Storage Table Cosmos TableClient TableOperation StorageAccount</PackageTags>
         <RepositoryUrl>https://github.com/jguadagno/JosephGuadagno.AzureHelpers.Storage</RepositoryUrl>
@@ -17,7 +17,7 @@
     <PropertyGroup>
         <VersionMajor>1</VersionMajor>
         <VersionMinor>0</VersionMinor>
-        <VersionBuild>3</VersionBuild>
+        <VersionBuild>4</VersionBuild>
     </PropertyGroup>
 
     <PropertyGroup>
