@@ -12,13 +12,15 @@ trigger:
 - main
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: ubuntu-latest
 
 variables:
 - name: buildConfiguration
   value: ${{ parameters.buildConfig }}
 - group: CodeSigning
 - group: Personal-Key-Vault
+#- name: System.Debug
+#  value: true
 
 steps:
 
