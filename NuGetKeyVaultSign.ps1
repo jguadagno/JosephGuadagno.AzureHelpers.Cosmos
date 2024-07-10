@@ -1,11 +1,11 @@
 [CmdletBinding()]
 param (
     [string]$FilePath,
-    [string]$AzureKeyVaultUrl = $Env:AzureKeyVaultUrl ,
-    [string]$AzureKeyVaultTenantId = $Env:AzureKeyVaultTenantId,
-    [string]$AzureKeyVaultClientId = $Env:AzureKeyVaultClientId,
-    [string]$AzureKeyVaultClientSecret = $Env:AzureKeyVaultClientSecret,
-    [string]$AzureKeyVaultCertificate = "JosephGuadagno-2021"
+    [string]$AzureKeyVaultUrl = $Env:PremiumAzureKeyVaultUrl ,
+    [string]$AzureKeyVaultTenantId = $Env:PremiumAzureKeyVaultTenantId,
+    [string]$AzureKeyVaultClientId = $Env:PremiumAzureKeyVaultClientId,
+    [string]$AzureKeyVaultClientSecret = $Env:PremiumAzureKeyVaultClientSecret,
+    [string]$AzureKeyVaultCertificate = "EVCodeSigning-2024"
 )
 
 Write-Host ("##[group]Sign Tool")

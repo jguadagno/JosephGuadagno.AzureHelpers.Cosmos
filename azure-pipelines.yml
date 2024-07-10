@@ -5,75 +5,75 @@ parameters:
     displayName: Build Configuration to Use
     default: Debug
     values:
-    - Debug
-    - Release
+      - Debug
+      - Release
 
 trigger:
-- main
+  - main
 
 pool:
   vmImage: ubuntu-latest
 
 variables:
-- name: buildConfiguration
-  value: ${{ parameters.buildConfig }}
-- group: CodeSigning
-- group: Personal-Key-Vault
+  - name: buildConfiguration
+    value: ${{ parameters.buildConfig }}
+  - group: CodeSigning
+  - group: Personal-Key-Vault
 #- name: System.Debug
 #  value: true
 
 steps:
 
-- task: UseDotNet@2
-  displayName: Setup .NET SDK Version 6.x
-  inputs:
-    packageType: sdk
-    version: 6.x
-    includePreviewVersions: false
+  - task: UseDotNet@2
+    displayName: Setup .NET SDK Version 8.x
+    inputs:
+      packageType: sdk
+      version: 8.x
+      includePreviewVersions: true
 
-- task: DotNetCoreCLI@2
-  displayName: 'Build the Assembly'
-  inputs:
-    command: 'build'
-    projects: '**/*.csproj'
-    arguments: '--configuration $(BuildConfiguration)'
+  - task: DotNetCoreCLI@2
+    displayName: 'Build the Assembly'
+    inputs:
+      command: 'build'
+      projects: '**/*.csproj'
+      arguments: '--configuration $(BuildConfiguration)'
 
-## Skipping the Unit Tests because they require the Azure Storage Emulator
-#- task: DotNetCoreCLI@2
-#  displayName: 'Run the Unit Tests'
-#  inputs:
-#    command: 'test'
-#    projects: '**/*.Tests.csproj'
+  - task: DotNetCoreCLI@2
+    displayName: 'Run the Unit Tests'
+    inputs:
+      command: 'test'
+      projects: '**/*.Tests.csproj'
+  
+  # Note: Running the 'Pack' command without the output set puts the .nupkg in the WorkingDirectory
+  - task: DotNetCoreCLI@2
+    displayName: Package up the Assembly
+    inputs:
+      command: 'pack'
+      packagesToPack: './src/*.csproj'
+      packDirectory: '$(Build.ArtifactStagingDirectory)/output'
+      nobuild: true
+      versioningScheme: 'off'
+      verbosityPack: 'Normal'
 
-# Note: Pack command with out the output set puts the .nupkg in the WorkingDirectory
-- task: DotNetCoreCLI@2
-  displayName: Package up the Assembly
-  inputs:
-    command: 'pack'
-    packagesToPack: './src/*.csproj'
-    packDirectory: '$(Build.ArtifactStagingDirectory)/output'
-    nobuild: true
-    versioningScheme: 'off'
-    verbosityPack: 'Normal'
 
-- task: DotNetCoreCLI@2
-  displayName: Install NuGetKeyVaultSignTool
-  inputs:
-    command: 'custom'
-    custom: 'tool'
-    arguments: 'install --tool-path . NuGetKeyVaultSignTool'
+  - task: DotNetCoreCLI@2
+    displayName: Install NuGetKeyVaultSignTool
+    inputs:
+      command: 'custom'
+      custom: 'tool'
+      arguments: 'install --tool-path . NuGetKeyVaultSignTool'
 
-- task: PowerShell@2
-  displayName: Running NuGetKeyVaultSign
-  inputs:
-    filePath: './NuGetKeyVaultSign.ps1'
-    arguments: '-FilePath "$(Build.ArtifactStagingDirectory)/output/*.nupkg" -AzureKeyVaultUrl $(azure-key-vault-url) -AzureKeyVaultTenantId $(azure-key-vault-tenant-id) -AzureKeyVaultClientId $(azure-key-vault-client-id) -AzureKeyVaultClientSecret $(azure-key-vault-client-secret) -AzureKeyVaultCertificate "JosephGuadagno-2022"'
-    pwsh: true
+  - task: PowerShell@2
+    displayName: Running NuGetKeyVaultSign
+    inputs:
+      filePath: './NuGetKeyVaultSign.ps1'
+      arguments: '-FilePath "$(Build.ArtifactStagingDirectory)/output/*.nupkg" -AzureKeyVaultUrl $(azure-key-vault-url) -AzureKeyVaultTenantId $(azure-key-vault-tenant-id) -AzureKeyVaultClientId $(azure-key-vault-client-id) -AzureKeyVaultClientSecret $(azure-key-vault-client-secret) -AzureKeyVaultCertificate "EVCodeSigning-2024"'
+      pwsh: true
 
-- task: NuGetCommand@2
-  displayName: Publishing package(s) to NuGet
-  inputs:
-    command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/output/*.nupkg'
-    nuGetFeedType: 'external'
-    publishFeedCredentials: 'Public-NuGet'
+  - task: NuGetCommand@2
+    displayName: Publishing package(s) to NuGet
+    inputs:
+      command: 'push'
+      packagesToPush: '$(Build.ArtifactStagingDirectory)/output/*.nupkg'
+      nuGetFeedType: 'external'
+      publishFeedCredentials: 'Public-NuGet'
