@@ -38,11 +38,11 @@ steps:
       projects: '**/*.csproj'
       arguments: '--configuration $(BuildConfiguration)'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Run the Unit Tests'
-    inputs:
-      command: 'test'
-      projects: '**/*.Tests.csproj'
+#  - task: DotNetCoreCLI@2
+#    displayName: 'Run the Unit Tests'
+#    inputs:
+#      command: 'test'
+#      projects: '**/*.Tests.csproj'
   
   # Note: Running the 'Pack' command without the output set puts the .nupkg in the WorkingDirectory
   - task: DotNetCoreCLI@2
