@@ -25,10 +25,10 @@ variables:
 steps:
 
   - task: UseDotNet@2
-    displayName: Setup .NET SDK Version 8.x
+    displayName: Setup .NET SDK Version 9.x
     inputs:
       packageType: sdk
-      version: 8.x
+      version: 9.x
       includePreviewVersions: true
 
   - task: DotNetCoreCLI@2
